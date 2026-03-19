@@ -39,41 +39,41 @@ activities = {
         "max_participants": 30,
         "participants": ["john@mergington.edu", "olivia@mergington.edu"]
     },
-    "Basketball Club": {
-        "description": "Learn basketball skills and compete in friendly matches",
-        "schedule": "Mondays and Wednesdays, 4:00 PM - 5:30 PM",
+    "Basketball Team": {
+        "description": "Competitive basketball team for students of all skill levels",
+        "schedule": "Tuesdays and Thursdays, 4:00 PM - 5:30 PM",
         "max_participants": 15,
-        "participants": []
+        "participants": ["james@mergington.edu", "ava@mergington.edu"]
     },
     "Tennis Club": {
-        "description": "Develop tennis techniques and participate in tournaments",
-        "schedule": "Tuesdays and Thursdays, 4:00 PM - 5:00 PM",
+        "description": "Tennis training and recreational play",
+        "schedule": "Mondays and Wednesdays, 3:30 PM - 5:00 PM",
         "max_participants": 12,
-        "participants": []
+        "participants": ["lucas@mergington.edu"]
     },
-    "Theater Club": {
-        "description": "Perform in plays and develop acting and stage craft skills",
-        "schedule": "Fridays, 4:00 PM - 6:00 PM",
+    "Drama Club": {
+        "description": "Theater performances, improvisation, and stage acting",
+        "schedule": "Wednesdays, 4:00 PM - 5:30 PM",
         "max_participants": 25,
-        "participants": []
+        "participants": ["isabella@mergington.edu", "henry@mergington.edu", "mia@mergington.edu"]
     },
-    "Painting Studio": {
-        "description": "Explore various painting techniques and create artwork",
-        "schedule": "Wednesdays, 3:30 PM - 5:00 PM",
+    "Visual Arts": {
+        "description": "Painting, drawing, and sculpture techniques",
+        "schedule": "Fridays, 4:00 PM - 5:30 PM",
         "max_participants": 18,
-        "participants": []
+        "participants": ["charlotte@mergington.edu", "alexander@mergington.edu"]
     },
     "Debate Team": {
-        "description": "Develop public speaking and argumentation skills in competitive debates",
-        "schedule": "Mondays and Fridays, 3:30 PM - 4:30 PM",
-        "max_participants": 20,
-        "participants": []
-    },
-    "Robotics Club": {
-        "description": "Design and build robots for competitions and challenges",
-        "schedule": "Tuesdays and Thursdays, 4:30 PM - 6:00 PM",
+        "description": "Competitive debate, public speaking, and argumentation skills",
+        "schedule": "Tuesdays, 3:30 PM - 5:00 PM",
         "max_participants": 16,
-        "participants": []
+        "participants": ["benjamin@mergington.edu", "amelia@mergington.edu", "ethan@mergington.edu"]
+    },
+    "Science Club": {
+        "description": "Hands-on experiments, STEM projects, and scientific research",
+        "schedule": "Thursdays, 4:00 PM - 5:30 PM",
+        "max_participants": 20,
+        "participants": ["harper@mergington.edu", "linda@mergington.edu"]
     }
 }
 
@@ -91,22 +91,17 @@ def get_activities():
     @app.post("/activities/{activity_name}/signup")
     def signup_for_activity(activity_name: str, email: str):
         """Sign up a student for an activity"""
+        # Validate activity exists
+        if activity_name not in activities:
+            raise HTTPException(status_code=404, detail="Activity not found")
 
-    # Validate activity exists
-    if activity_name not in activities:
-        raise HTTPException(status_code=404, detail="Activity not found")
+        # Get the specific activity
+        activity = activities[activity_name]
 
-    # Get the specific activity
-    activity = activities[activity_name]
+        # Validate student is not already signed up
+        if email in activity["participants"]:
+            raise HTTPException(status_code=400, detail="Student is already signed up for this activity")
 
-    # Check if student is already registered
-    if email in activity["participants"]:
-        raise HTTPException(status_code=400, detail=f"{email} is already registered for {activity_name}")
-
-    # Check if activity is at max capacity
-    if len(activity["participants"]) >= activity["max_participants"]:
-        raise HTTPException(status_code=409, detail=f"{activity_name} is full")
-
-    # Add student
-    activity["participants"].append(email)
-    return {"message": f"Signed up {email} for {activity_name}"}
+        # Add student
+        activity["participants"].append(email)
+        return {"message": f"Signed up {email} for {activity_name}"}
